@@ -1,0 +1,146 @@
+User switch command
+--> h
+c [nn]            - connect to job
+i [nn]            - interrupt job
+k [nn]            - kill job
+j                 - list all jobs
+s [shell]         - start local shell
+r [node [shell]]  - start remote shell
+q        - quit erlang
+? | h             - this message
+-->
+
+> f(variable)   % clear it
+> f().          % clear all variables
+
+Variable
+atom
+
+LOGICAL: and or xor not true false % true, false are atoms
+5 =:= 5.0  % exact equals?  -> false
+5 == 5.0  % simple equals?  -> true
+  =/=   % exact NOT equal
+  /=    >=  =<  % simple not equal
+  <  >  
+ordering in comparison:
+number < atom < reference < fun < port < pid < tuple < list < bit string
+  1 < false  % -> true
+  
+  
+    TUPLE:
+Point = {1,2}.
+Temp = {celcius, 100.0}
+
+    LIST: can contain anything  operatory ++ --, funkcje hd, tl, [T|H] [1|[]]
+[1, 2, 3, {numbers,[4,5,6]}, 5.34, atom].
+
+[97, 98, 99].  % -> "abc"
+5> [1,2,3] ++ [4,5].
+[1,2,3,4,5]
+6> [1,2,3,4,5] -- [1,2,3].
+[4,5]
+7> [2,4,2] -- [2,4].
+[2]
+RIGHT ASSOCIATIVE!
+9> [1,2,3] -- [1,2] -- [3].  % najpierw [1,2] -- [3]
+[3]
+
+LIST COMPREHENSION with operations and filters
+1> [2*N || N <- [1,2,3,4]].
+[2,4,6,8]
+2> [X || X <- [1,2,3,4,5,6,7,8,9,10], X rem 2 =:= 0].
+[2,4,6,8,10]
+5> [X+Y || X <- [1,2], Y <- [2,3]].     % ZIP
+[3,4,4,5]
+7> FoggyPlaces = [X || {X, fog} <- Weather].   %% inne niż fog wylecą
+[london,boston]
+
+    HEX numbers
+16#00FF
+
+    BITS     bsl (Bit Shift Left), bsr (Bit Shift Right), band, bor, bxor, and bnot
+Value
+Value:Size
+Value/TypeSpecifierList
+Type    (integer | float | binary | bytes | bitstring | bits | utf8 | utf16 | utf32)
+Sign    (signed | unsigned)
+Endian  ( big (default) | little | native)
+    72 = integer little  endian <<72,0,0,0>>
+Value:Size/TypeSpecifierList
+14> <<X2/integer-signed-little>> =  <<-44>>.
+<<"Ô">>
+1> Color = 16#F09A29.
+15768105
+2> Pixel = <<Color:24>>.
+<<240,154,41>>
+6> <<R:8, G:8, B:8>> = <<Pixe1:24>>.
+<<213,45,132>>
+7> R.
+213
+2#10101 = 2#10001 bor 2#00101.
+
+    BINARY STRING memory efficient, no operations, fixed strings
+<<"this is a bit string!">>
+
+    BITS COMPREHENSION 
+2> Pixels = <<213,45,132,64,76,32,76,0,0,234,32,15>>.
+<<213,45,132,64,76,32,76,0,0,234,32,15>>
+3> RGB = [ {R,G,B} || <<R:8,G:8,B:8>> <= Pixels ].
+[{213,45,132},{64,76,32},{76,0,0},{234,32,15}]
+
+
+    MODULES
+-module(useless).
+-export([add/2, hello/0]).
+-debug_info
+
+    COMPILING
+1> cd("/path/to/where/you/saved/the-module/").
+2> c(useless).
+4> useless:hello().
+%compile with flags
+7> compile:file(useless, [debug_info, export_all]).
+{ok,useless}
+8> c(useless, [debug_info, export_all]).
+
+
+
+-------- funkcje -----------
+head([H|_]) -> H.  %udajemy hd()
+second([_,X|_]) -> X. 
+
+same(X,X) ->
+    true;
+same(_,_) ->
+    false.
+    
+old_enough(X) when X >= 16 -> true;
+old_enough(_) -> false.
+right_age(X) when X >= 16, X =< 104 ->  % , => andalso    ;-> orelse
+true;
+right_age(_) ->
+false.
+
+%% note, this one would be better as a pattern match in function heads!
+%% I'm doing it this way for the sake of the example.
+help_me(Animal) ->
+Talk = if Animal == cat  -> "meow";
+Animal == beef -> "mooo";
+Animal == dog  -> "bark";
+Animal == tree -> "bark";
+true -> "fgdadfgna"
+end,
+{Animal, "says " ++ Talk ++ "!"}.
+
+beach(Temperature) ->
+case Temperature of
+{celsius, N} when N >= 20, N =< 45 ->
+'favorable';
+{kelvin, N} when N >= 293, N =< 318 ->
+'scientifically favorable';
+{fahrenheit, N} when N >= 68, N =< 113 ->
+'favorable in the US';
+_ ->
+'avoid beach'
+end.
+
